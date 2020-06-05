@@ -1,2 +1,2 @@
 # undockerizer
-Undockerizer an image to a shell script/batch file.
+Convert a docker Image to Shell script.
