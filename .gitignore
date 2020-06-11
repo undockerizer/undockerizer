@@ -28,5 +28,8 @@ docker-graalvm/ubuntu/environment-var-replacer-ubuntu
 docker-graalvm/centos/environment-var-replacer-centos
 /.apt_generated/
 /.apt_generated_tests/
-undockerizer-temp
-undockerized.sh
+/target/
+.project
+.classpath
+.settings
+undockerizer

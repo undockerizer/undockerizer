@@ -8,7 +8,7 @@ package com.github.arielcarrera.undockerizer;
 public class OSUtil {
 
 	public enum OSFamily {
-		WINDOWS, MAC_OS, UNIX, SOLARIS, OTHER
+		WINDOWS, MAC_OS, UNIX, UNIX_BASH, SOLARIS, OTHER
 	}
 
 	private static final String WIN = "WINDOWS", MAC = "MAC_OS", UNIX = "NIX", LINUX = "LINUX", AIX = "AIX", SOLARIS = "SUNOS";

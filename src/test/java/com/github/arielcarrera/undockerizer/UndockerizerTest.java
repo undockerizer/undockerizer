@@ -26,7 +26,19 @@ public class UndockerizerTest {
 	@Test
 	public void testMinimal() throws IOException {
 		exit.expectSystemExitWithStatus(0);
-		Undockerizer.main(new String[] {"-i","releases-nexus.pjn.gov.ar/pjn/scw-api:3.0.2", "-v", "-f"});
+		Undockerizer.main(new String[] {"-i","releases-nexus.pjn.gov.ar/pjn/scw-api:3.0.2", "-v", "-f", "-it"});
+	}
+	
+	@Test
+	public void testTar() throws IOException {
+		exit.expectSystemExitWithStatus(0);
+		Undockerizer.main(new String[] {"-i","releases-nexus.pjn.gov.ar/pjn/scw-api:3.0.2", "-v", "-f", "-it", "-t"});
+	}
+	
+	@Test
+	public void testNoInteractiveTar() throws IOException {
+		exit.expectSystemExitWithStatus(0);
+		Undockerizer.main(new String[] {"-i","releases-nexus.pjn.gov.ar/pjn/scw-api:3.0.2", "-v", "-f", "-t"});
 	}
 	
 	
