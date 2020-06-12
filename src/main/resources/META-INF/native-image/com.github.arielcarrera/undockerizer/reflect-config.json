@@ -1,0 +1,62 @@
+[
+	{
+		"name": "com.fasterxml.jackson.databind.ext.Java7HandlersImpl",
+		"methods": [
+			{
+				"name": "<init>",
+				"parameterTypes": []
+			}
+		]
+	},
+	{
+		"name": "com.fasterxml.jackson.databind.ext.Java7SupportImpl",
+		"methods": [
+			{
+				"name": "<init>",
+				"parameterTypes": []
+			}
+		]
+	},
+	{
+		"name": "com.github.arielcarrera.undockerizer.model.ConfigFile",
+		"allDeclaredFields": true,
+		"allDeclaredMethods": true,
+		"allDeclaredConstructors": true
+	},
+	{
+		"name": "com.github.arielcarrera.undockerizer.model.InspectData",
+		"allDeclaredFields": true,
+		"allDeclaredMethods": true,
+		"allDeclaredConstructors": true
+	},
+	{
+		"name": "com.github.arielcarrera.undockerizer.model.Manifest",
+		"allDeclaredFields": true,
+		"allDeclaredMethods": true,
+		"allDeclaredConstructors": true
+	},
+	{
+		"name": "com.github.arielcarrera.undockerizer.model.config.Config",
+		"allDeclaredFields": true,
+		"allDeclaredMethods": true,
+		"allDeclaredConstructors": true
+	},
+	{
+		"name": "com.github.arielcarrera.undockerizer.model.config.GraphDriver",
+		"allDeclaredFields": true,
+		"allDeclaredMethods": true,
+		"allDeclaredConstructors": true
+	},
+	{
+		"name": "com.github.arielcarrera.undockerizer.model.config.History",
+		"allDeclaredFields": true,
+		"allDeclaredMethods": true,
+		"allDeclaredConstructors": true
+	},
+	{
+		"name": "com.github.arielcarrera.undockerizer.model.config.RootFS",
+		"allDeclaredFields": true,
+		"allDeclaredMethods": true,
+		"allDeclaredConstructors": true
+	}
+]

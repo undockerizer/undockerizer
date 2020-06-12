@@ -21,15 +21,10 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-docker-graalvm/centos/environment-var-replacer
-docker-graalvm/ubuntu/environment-var-replacer
-docker-graalvm/alpine/environment-var-replacer
-docker-graalvm/ubuntu/environment-var-replacer-ubuntu
-docker-graalvm/centos/environment-var-replacer-centos
 /.apt_generated/
 /.apt_generated_tests/
 /target/
 .project
 .classpath
 .settings
-undockerizer
+/undockerizer/

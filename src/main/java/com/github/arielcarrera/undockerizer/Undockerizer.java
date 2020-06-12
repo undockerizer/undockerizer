@@ -41,6 +41,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.arielcarrera.undockerizer.OSUtil.OSFamily;
+import com.github.arielcarrera.undockerizer.exceptions.ImageNotFoundException;
 import com.github.arielcarrera.undockerizer.model.ConfigFile;
 import com.github.arielcarrera.undockerizer.model.InspectData;
 import com.github.arielcarrera.undockerizer.model.Manifest;
@@ -73,9 +74,6 @@ public class Undockerizer implements Callable<Integer> {
     @Option(names = {"-v", "--verbose"}, required = false, description = "Verbose mode.", defaultValue = "false")
     boolean verbose;
     
-    @Option(names = {"-sl", "--saveLogs"}, required = false, description = "Save log files.", defaultValue = "false")
-    boolean trace;
-
     @Option(names = {"-f", "--force"}, required = false, description = "Overwrite output file if exists", defaultValue = "false")
     boolean force;
     
@@ -97,8 +95,12 @@ public class Undockerizer implements Callable<Integer> {
     
     private static boolean dockerPullSuccessful = false;
     
+    private boolean pulled = false;
     
-    private static final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true).configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+    private static final ObjectMapper mapper = new ObjectMapper()
+    		.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+    		.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
+    		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     
 	public static void main(String[] args) {
 		int exitCode = new CommandLine(new Undockerizer()).execute(args);
@@ -111,7 +113,14 @@ public class Undockerizer implements Callable<Integer> {
 		checkDockerAvailability();
 		
 		// inspect docker image info
-		InspectData info = inspectDockerImageInfo();
+		InspectData info;
+		try {
+			info = inspectDockerImageInfo();
+		} catch (ImageNotFoundException e) {
+			pullDockerImage();
+			pulled = true;
+			info = inspectDockerImageInfo();
+		}
 		
 		// first check (cache) if files exists in temp file
 		Path outputDirPath = Paths.get(outputDirPathStr);
@@ -121,7 +130,7 @@ public class Undockerizer implements Callable<Integer> {
 		
 		// pull docker image
 		if (tempData == null) {
-			pullDockerImage();
+			if (!pulled) pullDockerImage();
 
 			// read docker image
 	    	Path tarFilePath = saveImageTar(outputDirPath.toFile(), info.getContainer());
@@ -253,26 +262,38 @@ public class Undockerizer implements Callable<Integer> {
 		return container.substring(0, Math.abs(container.length()/2)) + "-content";
 	}
 
-	private InspectData inspectDockerImageInfo() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+	private InspectData inspectDockerImageInfo() throws IOException, InterruptedException, ExecutionException, TimeoutException, ImageNotFoundException {
 		
 		if (verbose) System.out.println("Getting docker image info...");
 		ProcessBuilder builder = new ProcessBuilder();
 		if (OSUtil.isWindows()) {
-		    builder.command("cmd.exe", "/c", "docker", "inspect", dockerImage);
+		    builder.command("cmd.exe", "/c", "docker inspect " + dockerImage);
 		} else {
-		    builder.command(shellPathStr, "-c", "docker", "inspect", dockerImage);
+		    builder.command(shellPathStr, "-c", "docker inspect " + dockerImage);
 		}
-		if (trace) builder.redirectOutput(Paths.get(outputDirPathStr, "inspect.log").toFile());
 		Process process = builder.start();
 		StringBuilder strBuilder = new StringBuilder();
 		StreamOutput stream = new StreamOutput(process.getInputStream(), line -> Undockerizer.readAndlogResponse(strBuilder, line, verbose));
-		Future<?> submit = Executors.newSingleThreadExecutor().submit(stream);
+		
+		StringBuilder errStrBuilder = new StringBuilder();
+		StreamOutput errorStream = new StreamOutput(process.getErrorStream(), line -> Undockerizer.readAndlogErrorResponse(errStrBuilder, line));
+		Future<?> result = Executors.newSingleThreadExecutor().submit(stream);
+		Future<?> errors = Executors.newSingleThreadExecutor().submit(errorStream);
+		
+		result.get(10, TimeUnit.SECONDS);
+		errors.get(10, TimeUnit.SECONDS);
+
+		if (!errStrBuilder.toString().isEmpty()) {
+			String s = errStrBuilder.toString();
+			if (s.startsWith("Error: No such image:")) {
+				throw new ImageNotFoundException("Image not found locally", dockerImage);
+			}
+		}
 		int exitCode = process.waitFor();
 		if (exitCode != 0) {
 			if (!verbose) System.out.println("Error inspecting docker image info. Please run in verbose mode for more details (-v).");
 			throw new IllegalStateException("Error inspecting Docker image info: " + dockerImage);
 		};
-		submit.get(10, TimeUnit.SECONDS);
 		InspectData info = readInspectData(strBuilder.toString());
 		if (verbose) System.out.println("-- Docker image info read --");
 
@@ -414,22 +435,29 @@ public class Undockerizer implements Callable<Integer> {
     	// read docker image -> create tar file from image
     	Path tarFilePath = Paths.get(outputDirPathStr, container + ".tar");
     	ProcessBuilder builder = new ProcessBuilder();
-    	if (trace) builder.redirectOutput(Paths.get(outputDirPathStr, "download.log").toFile());
-    	
 		if (OSUtil.isWindows()) {
-		    builder.command("cmd.exe", "/c", "docker", "save", dockerImage, "-o", tarFilePath.toString());
+		    builder.command("cmd.exe", "/c", "docker save " + dockerImage + " -o " + tarFilePath.toString());
 		} else {
-		    builder.command(shellPathStr, "-c", "docker", "save", dockerImage, "-o", tarFilePath.toString());
+		    builder.command(shellPathStr, "-c", "docker save " + dockerImage + " -o " + tarFilePath.toString());
 		}
 		Process process = builder.start();
-		StreamOutput stream = new StreamOutput(process.getInputStream(), line -> Undockerizer.logResponse(line, verbose));
-		Future<?> submit = Executors.newSingleThreadExecutor().submit(stream);
+		
+		StringBuilder strBuilder = new StringBuilder();
+		StreamOutput stream = new StreamOutput(process.getInputStream(), line -> Undockerizer.readAndlogResponse(strBuilder, line, verbose));
+		
+		StringBuilder errStrBuilder = new StringBuilder();
+		StreamOutput errorStream = new StreamOutput(process.getErrorStream(), line -> Undockerizer.readAndlogErrorResponse(errStrBuilder, line));
+		Future<?> result = Executors.newSingleThreadExecutor().submit(stream);
+		Future<?> errors = Executors.newSingleThreadExecutor().submit(errorStream);
+		
+		result.get(120, TimeUnit.SECONDS);
+		errors.get(120, TimeUnit.SECONDS);
+		
 		int exitCode = process.waitFor();
 		if (exitCode != 0) {
 			if (!verbose) System.out.println("Error processing docker command. Please run in verbose mode for more details (-v).");
 			throw new IllegalStateException("Error processing docker command");
 		}
-		submit.get(10, TimeUnit.SECONDS);
 		if (verbose) System.out.println("-- Docker image downloaded --");
 		return tarFilePath;
 	}
@@ -439,20 +467,28 @@ public class Undockerizer implements Callable<Integer> {
 		if (verbose) System.out.println("Checking docker runtime availability...");
 		ProcessBuilder builder = new ProcessBuilder();
 		if (OSUtil.isWindows()) {
-		    builder.command("cmd.exe", "/c", "docker", "pull", dockerImage);
+		    builder.command("cmd.exe", "/c", "docker pull " + dockerImage);
 		} else {
-		    builder.command(shellPathStr, "-c", "docker", "pull", dockerImage);
+		    builder.command(shellPathStr, "-c", "docker pull " + dockerImage);
 		}
-		if (trace) builder.redirectOutput(Paths.get(outputDirPathStr, "pull.log").toFile());
 		Process process = builder.start();
-		StreamOutput stream = new StreamOutput(process.getInputStream(), line -> Undockerizer.checkDockerPull(line, dockerImage, verbose));
-		Future<?> submit = Executors.newSingleThreadExecutor().submit(stream);
+		
+		StringBuilder strBuilder = new StringBuilder();
+		StreamOutput stream = new StreamOutput(process.getInputStream(), line -> Undockerizer.readAndlogResponse(strBuilder, line, verbose));
+		
+		StringBuilder errStrBuilder = new StringBuilder();
+		StreamOutput errorStream = new StreamOutput(process.getErrorStream(), line -> Undockerizer.readAndlogErrorResponse(errStrBuilder, line));
+		Future<?> result = Executors.newSingleThreadExecutor().submit(stream);
+		Future<?> errors = Executors.newSingleThreadExecutor().submit(errorStream);
+		
+		result.get(5, TimeUnit.MINUTES);
+		errors.get(5, TimeUnit.MINUTES);
+		
 		int exitCode = process.waitFor();
 		if (exitCode != 0) {
 			if (!verbose) System.out.println("Error pulling docker image. Please run in verbose mode for more details (-v).");
 			throw new IllegalStateException("Error pulling Docker image: " + dockerImage);
 		};
-		submit.get(10, TimeUnit.SECONDS);
 		if (verbose) {
 			if (dockerPullSuccessful) System.out.println("-- Docker image pulled --");
 			else System.err.println("WARN: Docker image pulling cannot be validated");
@@ -463,22 +499,29 @@ public class Undockerizer implements Callable<Integer> {
 		if (verbose) System.out.println("Checking docker runtime availability...");
 		ProcessBuilder builder = new ProcessBuilder();
 		if (OSUtil.isWindows()) {
-		    builder.command("cmd.exe", "/c", "docker", "--version");
+		    builder.command("cmd.exe", "/c", "docker --version");
 		} else {
-		    builder.command(shellPathStr, "-c", "docker", "--version");
+		    builder.command(shellPathStr, "-c", "docker --version");
 		}
-		if (trace) builder.redirectOutput(Paths.get(outputDirPathStr, "check-docker.log").toFile());
 		Process process = builder.start();
-		StreamOutput stream = new StreamOutput(process.getInputStream(), line -> Undockerizer.checkDockerVersion(line, verbose));
-		Future<?> submit = Executors.newSingleThreadExecutor().submit(stream);
+		
+		StringBuilder strBuilder = new StringBuilder();
+		StreamOutput stream = new StreamOutput(process.getInputStream(), line -> Undockerizer.readAndlogResponse(strBuilder, line, verbose));
+		
+		StringBuilder errStrBuilder = new StringBuilder();
+		StreamOutput errorStream = new StreamOutput(process.getErrorStream(), line -> Undockerizer.readAndlogErrorResponse(errStrBuilder, line));
+		Future<?> result = Executors.newSingleThreadExecutor().submit(stream);
+		Future<?> errors = Executors.newSingleThreadExecutor().submit(errorStream);
+		
+		result.get(10, TimeUnit.SECONDS);
+		errors.get(10, TimeUnit.SECONDS);
+		
 		int exitCode = process.waitFor();
 		if (exitCode != 0) {
 			if (!verbose) System.out.println("Error checking docker availability. Please run in verbose mode for more details (-v).");
 			throw new IllegalStateException("Docker is required");
 		};
-		submit.get(10, TimeUnit.SECONDS);
 	}
-	
 	private static final String REGEX_CMD = "(([\\w\\/\\\\.]*\\s*-c\\s)#\\(nop\\))\\s*CMD\\s";
 
 	private static final String REGEX_ENV = "([\\w_-]*)(?:=(.*))?";
@@ -745,7 +788,7 @@ public class Undockerizer implements Callable<Integer> {
 	}
 	
 	private InspectData readInspectData(String json) throws IOException {
-		
+		if (json.trim().isEmpty() || json.contains("connect: permission denied")) throw new RuntimeException("Insufficient permissions to run docker command");
 		List<InspectData> list = mapper.readValue(json, new TypeReference<List<InspectData>>(){});
 		return !list.isEmpty() ? list.get(0) : null;
 	}
@@ -805,6 +848,12 @@ public class Undockerizer implements Callable<Integer> {
 		if (verbose) System.out.println("result: " + line);
 		builder.append(line);
 	}
+	
+	private static void readAndlogErrorResponse(StringBuilder builder, String line) {
+		System.err.println("result: " + line);
+		builder.append(line);
+	}
+	
 	private static void logResponse(String line, boolean verbose) {
 		if (verbose) System.out.println("result: " + line);
 	}
