@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class ShWriter extends AbstractWriter {
 
-	private static final String BEGIN_BLOCK= "#!/bin/sh";
+	private static final String DEFAULT_SHELL = "/bin/sh";
 	private static final String COMMENT_PREFIX= "# ";
 	private static final String ECHO_PREFIX= "echo ";
 	protected final String customShell;
@@ -19,9 +19,14 @@ public class ShWriter extends AbstractWriter {
 		this.customShell = customShell;
 	}
 	
-	protected String getBeginBlock() {
-		return (customShell == null ? BEGIN_BLOCK : "#!" + customShell)  + "\nUNDOCKERIZER_WORKDIR=\"$PWD\"";
+	public String getShell() {
+		return customShell == null ? DEFAULT_SHELL : customShell;
 	}
+	
+	protected String getBeginBlock() {
+		return "#!" + getShell()  + "\nUNDOCKERIZER_WORKDIR=\"$PWD\"";
+	}
+	
 	protected String getCommentPrefix() {
 		return COMMENT_PREFIX;
 	}
@@ -78,7 +83,7 @@ public class ShWriter extends AbstractWriter {
 	}
 	
 	private String writeWithSudo(String s) {
-		return "sudo -E -u " + user +  " " +  s;
+		return "sudo -E -u " + user +  " " + customShell + " -c '" + s + "'";
 	}
 
 	private String escape(String s) {
@@ -105,6 +110,5 @@ public class ShWriter extends AbstractWriter {
 	String getLineSeparator() {
 		return "\n";
 	}
-
 
 }

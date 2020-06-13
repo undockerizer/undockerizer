@@ -8,7 +8,6 @@ public abstract class AbstractWriter implements Writer {
 	protected boolean interactive;
 	protected String user = "root";
 	
-	
 	abstract String getBeginBlock();
 	abstract String getCommentPrefix();
 	abstract String getEchoPrefix();
@@ -38,9 +37,6 @@ public abstract class AbstractWriter implements Writer {
 		writer.write(getEchoPrefix() + s);
 		writer.write(getLineSeparator());
 	}
-	
-	@Override
-	public abstract void writeCommand(String s) throws IOException ;
 	
 	@Override
 	public void writeEnd() throws IOException {

@@ -1,4 +1,4 @@
-package com.github.arielcarrera.undockerizer.model;
+package com.github.arielcarrera.undockerizer.model.image;
 
 import java.util.List;
 

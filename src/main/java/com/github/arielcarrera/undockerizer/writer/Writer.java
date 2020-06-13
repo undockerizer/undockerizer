@@ -15,5 +15,6 @@ public interface Writer {
 	void writeEnd() throws IOException;
 	void writeChangeUser(String user) throws IOException;
 	
+	
 
 }

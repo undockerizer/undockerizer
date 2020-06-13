@@ -2,7 +2,7 @@ package com.github.arielcarrera.undockerizer.writer;
 
 public class BashWriter extends ShWriter {
 
-	private static final String BEGIN_BLOCK= "#!/bin/bash";
+	private static final String DEFAULT_SHELL = "/bin/bash";
 	
 	public BashWriter(java.io.BufferedWriter writer, boolean interactive) {
 		super(writer, interactive);
@@ -12,8 +12,10 @@ public class BashWriter extends ShWriter {
 		super(writer, customShell, interactive);
 	}
 	
-	protected String getBeginBlock() {
-		return (customShell == null ? BEGIN_BLOCK : "#!" + customShell)  + "\nUNDOCKERIZER_WORKDIR=\"$PWD\"";
+	public String getShell() {
+		return customShell == null ? DEFAULT_SHELL : customShell;
 	}
+	
+
 	
 }

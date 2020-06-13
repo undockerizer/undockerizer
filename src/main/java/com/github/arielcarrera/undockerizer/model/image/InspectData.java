@@ -1,12 +1,12 @@
-package com.github.arielcarrera.undockerizer.model;
+package com.github.arielcarrera.undockerizer.model.image;
 
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.arielcarrera.undockerizer.model.config.Config;
-import com.github.arielcarrera.undockerizer.model.config.GraphDriver;
-import com.github.arielcarrera.undockerizer.model.config.RootFS;
+import com.github.arielcarrera.undockerizer.model.image.config.Config;
+import com.github.arielcarrera.undockerizer.model.image.config.GraphDriver;
+import com.github.arielcarrera.undockerizer.model.image.config.RootFS;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

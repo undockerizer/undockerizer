@@ -1,4 +1,4 @@
-package com.github.arielcarrera.undockerizer;
+package com.github.arielcarrera.undockerizer.utils;
 
 /**
  * Operative System Utility
