@@ -1,13 +1,13 @@
-package com.github.arielcarrera.undockerizer;
+package com.github.arielcarrera.undockerizer.managers;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.github.arielcarrera.undockerizer.model.ConfigFile;
-import com.github.arielcarrera.undockerizer.model.Manifest;
-import com.github.arielcarrera.undockerizer.model.config.History;
+import com.github.arielcarrera.undockerizer.model.image.ConfigFile;
+import com.github.arielcarrera.undockerizer.model.image.Manifest;
+import com.github.arielcarrera.undockerizer.model.image.config.History;
 
 /**
  * Attachment Manager

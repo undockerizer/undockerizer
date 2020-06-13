@@ -1,6 +1,8 @@
 package com.github.arielcarrera.undockerizer.writer;
 
 import java.io.IOException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ShWriter extends AbstractWriter {
 
@@ -78,7 +80,8 @@ public class ShWriter extends AbstractWriter {
 	}
 	
 	private String writeWithSudo(String s) {
-		return "sudo -E -u " + user +  " " +  s;
+		if (envVarSet.isEmpty()) return "sudo -E -u " + user +  " " +  s;
+		return "sudo -E --whitelist-environment=" + envVarSet.stream().collect(Collectors.joining(",")) + " -u " + user +  " " +  s;
 	}
 
 	private String escape(String s) {
@@ -91,6 +94,7 @@ public class ShWriter extends AbstractWriter {
 		writer.write(getLineSeparator());
 		writer.write("[ $? -eq 0 ]  || exit 20");
 		writer.write(getLineSeparator());
+		envVarSet.add(s);
 	}
 
 	@Override

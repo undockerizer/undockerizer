@@ -1,4 +1,4 @@
-package com.github.arielcarrera.undockerizer.model.config;
+package com.github.arielcarrera.undockerizer.model.image.config;
 
 import java.util.ArrayList;
 import java.util.HashMap;

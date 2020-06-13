@@ -2,7 +2,7 @@ package com.github.arielcarrera.undockerizer.writer;
 
 import java.io.BufferedWriter;
 
-import com.github.arielcarrera.undockerizer.OSUtil.OSFamily;
+import com.github.arielcarrera.undockerizer.utils.OSUtil.OSFamily;
 
 public class WriterFactory {
 
