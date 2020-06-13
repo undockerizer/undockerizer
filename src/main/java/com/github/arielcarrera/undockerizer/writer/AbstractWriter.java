@@ -1,15 +1,12 @@
 package com.github.arielcarrera.undockerizer.writer;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 public abstract class AbstractWriter implements Writer {
 
 	protected java.io.BufferedWriter writer;
 	protected boolean interactive;
 	protected String user = "root";
-	protected Set<String> envVarSet = new HashSet<String>();
 	
 	abstract String getBeginBlock();
 	abstract String getCommentPrefix();

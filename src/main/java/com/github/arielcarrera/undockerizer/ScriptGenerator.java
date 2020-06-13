@@ -29,7 +29,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ScriptGenerator {
 
-	private static final String REGEX_CMD = "(([\\w\\/\\\\.]*\\s*-c\\s)#\\(nop\\))\\s*CMD\\s";
+	private static final String REGEX_NO_OP = "(([\\w\\/\\\\.]*\\s*-c\\s)#\\(nop\\))\\s";
 
 	private static final String REGEX_ENV = "([\\w_-]*)(?:=(.*))?";
 	
@@ -44,24 +44,26 @@ public class ScriptGenerator {
 	public void generateScript(Manifest manifest, ConfigFile cfg, Writer w) throws IOException {
 		AttachmentManager attachManager = new AttachmentManager(manifest, cfg);
 		// TODO guardar endpoint, combinarlo con este archivo y ejecutarle
-		String lastCommandSentence = null;
+		String lastCommandSentence, lastEntryPointSentence = null;
 		List<History> hist = cfg.getHistory();
-		boolean firstCommandFound = false;
+		boolean firstNoOpFound = false;
 		String noOpsPrefix = null, instructionprefix = null;
-		Pattern cmdPattern = Pattern.compile(REGEX_CMD);
+		Pattern noOpPattern = Pattern.compile(REGEX_NO_OP);
 		Pattern envPattern = Pattern.compile(REGEX_ENV);
 		for (Iterator<History> iterator = hist.iterator(); iterator.hasNext();) {
 			History history = iterator.next();
 			if (verbose) System.out.println("Processing line: " +  history.getCreatedBy());
 			
 			String line = history.getCreatedBy();
-			if (line != null) {
+			if (line == null) {
+				if (firstNoOpFound) System.out.println("WARN: layer without creation data");
+			} else {
 				//check first command
-				if (!firstCommandFound) {
+				if (!firstNoOpFound) {
 					if (history.isEmptyLayer()) {
-						Matcher matcher = cmdPattern.matcher(line);
+						Matcher matcher = noOpPattern.matcher(line);
 						if (matcher.find()) {
-							firstCommandFound = true;
+							firstNoOpFound = true;
 							noOpsPrefix = matcher.group(1);
 							instructionprefix = matcher.group(2);
 							if (verbose) System.out.println("--> First command found. noOpsPrefix: " +  noOpsPrefix + ", instructionPrefix: " + instructionprefix);
@@ -77,7 +79,9 @@ public class ScriptGenerator {
 								String value = sentence.substring(5);
 								w.writeComment(value);
 								if (verbose) System.out.println("--> Label added: " + value);
-								
+							} else if (sentence.startsWith("MAINTAINER ")) {
+								w.writeComment(sentence);
+								if (verbose) System.out.println("--> Maintainer added: " + sentence);
 							} else if (sentence.startsWith("ENV ")) {
 								Matcher matcher = envPattern.matcher(sentence.substring(4));
 								if (matcher.find()) {
@@ -125,10 +129,10 @@ public class ScriptGenerator {
 								w.writeComment("Expose Ports: " + value);
 								if (verbose) System.out.println("--> Comment: Expose ports " + value);
 							} else if (sentence.startsWith("CMD ")) {
-								String cmd = sentence.trim();
-								if (cmd.charAt(4) == '[' && cmd.charAt(5) == '"' && cmd.endsWith("\"]")) {
-									cmd = cmd.substring(6, cmd.length() - 2); //remove also first " and last "
-									StringTokenizer tokenizer = new StringTokenizer(cmd, "\" \"");
+								String value = sentence.trim();
+								if (value.charAt(4) == '[' && value.charAt(5) == '"' && value.endsWith("\"]")) {
+									value = value.substring(6, value.length() - 2); //remove also first " and last "
+									StringTokenizer tokenizer = new StringTokenizer(value, "\" \"");
 									StringBuilder builder = new StringBuilder();
 									boolean appendSpace = false;
 									while (tokenizer.hasMoreElements()) {
@@ -140,8 +144,31 @@ public class ScriptGenerator {
 									lastCommandSentence = builder.toString();
 									if (verbose) System.out.println("--> CMD line saved: " + lastCommandSentence);
 								} else {
-									System.err.println("Error processing CMD line (skiped): " + sentence);
+									lastCommandSentence = value.substring(4); 
+									if (verbose) System.out.println("--> CMD line saved: " + lastCommandSentence);
 								}
+							}  else if (sentence.startsWith("ENTRYPOINT ")) {
+								String value = sentence.trim();
+								if (value.charAt(11) == '[' && value.charAt(12) == '"' && value.endsWith("\"]")) {
+									value = value.substring(13, value.length() - 2); //remove also first " and last "
+									StringTokenizer tokenizer = new StringTokenizer(value, "\" \"");
+									StringBuilder builder = new StringBuilder();
+									boolean appendSpace = false;
+									while (tokenizer.hasMoreElements()) {
+										String object = (String) tokenizer.nextElement();
+										if (appendSpace) builder.append(" ");
+										builder.append(object);
+										appendSpace = true;
+									}
+									lastEntryPointSentence = builder.toString();
+									if (verbose) System.out.println("--> ENTRYPOINT line saved: " + lastEntryPointSentence);
+								} else {
+									lastEntryPointSentence = value.substring(4); 
+									if (verbose) System.out.println("--> ENTRYPOINT line saved: " + lastEntryPointSentence);
+								}
+							} else {
+								w.writeComment(sentence);
+								if (verbose) System.err.println("--> WARN: Operation not supported (comment added): " + sentence);
 							}
 						}
 					} else {

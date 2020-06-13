@@ -43,7 +43,6 @@ public class WindowsWriter extends AbstractWriter {
 	public void writeEnvVar(String s, String value) throws IOException {
 		writer.write(SET_PREFIX + s + "=" + value);
 		writer.write(getLineSeparator());
-		envVarSet.add(s);
 	}
 
 	@Override

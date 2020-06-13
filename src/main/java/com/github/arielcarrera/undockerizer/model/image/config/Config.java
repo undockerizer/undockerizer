@@ -40,13 +40,13 @@ public class Config {
 	@JsonProperty("Image")
 	private String image;
 	@JsonProperty("Volumes")
-	private String volumes;
+	private Map<String, Object> volumes = new HashMap<String, Object>();
 	@JsonProperty("WorkingDir")
 	private String workingDir;
 	@JsonProperty("Entrypoint")
-	private String entrypoint;
+	private List<String> entrypoint = new ArrayList<String>();
 	@JsonProperty("OnBuild")
-	private String onBuild;
+	private List<String> onBuild = new ArrayList<String>();
 	@JsonProperty("Labels")
 	private Map<String, String> labels;
 }
