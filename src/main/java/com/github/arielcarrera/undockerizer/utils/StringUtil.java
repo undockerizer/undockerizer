@@ -34,25 +34,24 @@ public class StringUtil {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
 		for (int i = 0; i < s.length(); i++) {
-			//TODO improve this logic to support = inside vars
 			char c = s.charAt(i);
 			if ( c == '=') {
 				if (!first) {
 					for (int j = i; j >= 0; j--) {
 						char c2 = s.charAt(j);
 						if (c2 == ' ') {
-							builder.insert(builder.length() - (i - j), "'");
+							builder.insert(builder.length() - (i - j), "\"");
 							break;
 						}
 					}
 				}
-				builder.append("='");
+				builder.append("=\"");
 				first = false;
 			} else {
 				builder.append(c);
 			}
 		}
-		builder.append("'");
+		builder.append("\"");
 		return builder.toString();
 	}
 	
