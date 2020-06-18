@@ -1,5 +1,5 @@
 #!/bin/sh
-UNDOCKERIZER_WORKDIR="$PWD"
+export UNDOCKERIZER_WORKDIR="$PWD"
 # MAINTAINER Marek Goldmann <mgoldman@redhat.com>
 sudo -E -u root /bin/sh -c 'yum update -y && yum -y install xmlstarlet saxon augeas bsdtar unzip && yum clean all'
 [ $? -eq 0 ]  || exit 10
@@ -28,3 +28,4 @@ export LAUNCH_JBOSS_IN_BACKGROUND=true
 [ $? -eq 0 ]  || exit 20
 # Changed user to: jboss
 # Expose Ports: 8080
+echo Script executed successfully.

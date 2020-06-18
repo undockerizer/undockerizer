@@ -7,6 +7,7 @@ public abstract class AbstractWriter implements Writer {
 	protected java.io.BufferedWriter writer;
 	protected boolean interactive;
 	protected String user = "root";
+	protected boolean escapingDisabled;
 	
 	abstract String getBeginBlock();
 	abstract String getCommentPrefix();
@@ -14,10 +15,11 @@ public abstract class AbstractWriter implements Writer {
 	abstract String getEndBlock();
 	abstract String getLineSeparator();
 	
-	public AbstractWriter(java.io.BufferedWriter writer, boolean interactive) {
+	public AbstractWriter(java.io.BufferedWriter writer, boolean interactive, boolean escapingDisabled) {
 		if (writer == null) throw new IllegalArgumentException("Writer is required");
 		this.writer = writer;
 		this.interactive = interactive;
+		this.escapingDisabled = escapingDisabled;
 	}
 	
 	@Override
@@ -44,6 +46,8 @@ public abstract class AbstractWriter implements Writer {
 			writer.write(getEndBlock());
 			writer.write(getLineSeparator());
 		}
+		writer.write(getEchoPrefix() + "Script executed successfully.");
+		writer.write(getLineSeparator());
 	}
 	
 	@Override

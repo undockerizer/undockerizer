@@ -8,9 +8,9 @@ public class UndockerizerScwTest extends BaseUndockerizerTest {
 
 	@Getter
 	private final String 
-		imageName = "releases-nexus.pjn.gov.ar/pjn/scw-api:3.0.2", 
-		testFolderName = "scw",
-		testFileName = "undockerizer-36a3e8de4c6b4a982d9d66a50b6242de.sh";
+		imageName = "releases-nexus.pjn.gov.ar/pjn/scw-api:3.0.3", 
+		testFolderName = "priv/scw-api",
+		testFileName = "undockerizer-604f40911a1bbfa192201bd98b7d5a4c.sh";
 	
 	
 }

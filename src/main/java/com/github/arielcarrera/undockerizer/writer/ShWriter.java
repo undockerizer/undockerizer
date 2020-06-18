@@ -9,13 +9,13 @@ public class ShWriter extends AbstractWriter {
 	private static final String ECHO_PREFIX= "echo ";
 	protected final String customShell;
 	
-	public ShWriter(java.io.BufferedWriter writer, boolean interactive) {
-		super(writer, interactive);
+	public ShWriter(java.io.BufferedWriter writer, boolean interactive, boolean escapingDisabled) {
+		super(writer, interactive, escapingDisabled);
 		this.customShell = null;
 	}
 	
-	public ShWriter(java.io.BufferedWriter writer, String customShell, boolean interactive) {
-		super(writer, interactive);
+	public ShWriter(java.io.BufferedWriter writer, String customShell, boolean interactive, boolean escapingDisabled) {
+		super(writer, interactive, escapingDisabled);
 		this.customShell = customShell;
 	}
 	
@@ -24,7 +24,7 @@ public class ShWriter extends AbstractWriter {
 	}
 	
 	protected String getBeginBlock() {
-		return "#!" + getShell()  + "\nUNDOCKERIZER_WORKDIR=\"$PWD\"";
+		return "#!" + getShell()  + "\nexport UNDOCKERIZER_WORKDIR=\"$PWD\"";
 	}
 	
 	protected String getCommentPrefix() {
@@ -39,8 +39,9 @@ public class ShWriter extends AbstractWriter {
 	
 	@Override
 	public void writeCommand(String s) throws IOException {
+		String lineWithSudo = writeWithSudo(s);
 		if (interactive) {
-			writer.write("read -p \"Are you sure do you want to execute (" + escape(s) + ")? \" -n 1 -r");
+			writer.write("read -p \"Line: " + escapePrint(lineWithSudo) + "\nAre you sure do you want to execute? \" -n 1 -r");
 			writer.write(getLineSeparator());
 			writer.write("printf \"\\n\"");
 			writer.write(getLineSeparator());
@@ -49,7 +50,7 @@ public class ShWriter extends AbstractWriter {
 			writer.write("then");
 			writer.write(getLineSeparator());
 		}
-		writer.write(writeWithSudo(s));
+		writer.write(lineWithSudo);
 		writer.write(getLineSeparator());
 		writer.write("[ $? -eq 0 ]  || exit 10");
 		writer.write(getLineSeparator());
@@ -61,8 +62,9 @@ public class ShWriter extends AbstractWriter {
 	
 	@Override
 	public void writeCommand(String s, String variables) throws IOException {
+		String lineWithSudo = writeWithSudo((!escapingDisabled ? escapeVar(variables) : variables) + ";" + s);
 		if (interactive) {
-			writer.write("read -p \"Are you sure do you want to execute ( " + escape(variables) + ";" + escape(s) + ")? \" -n 1 -r");
+			writer.write("read -p \"Line: " + escapePrint(lineWithSudo) + "\nAre you sure do you want to execute? \" -n 1 -r");
 			writer.write(getLineSeparator());
 			writer.write("printf \"\\n\"");
 			writer.write(getLineSeparator());
@@ -71,8 +73,7 @@ public class ShWriter extends AbstractWriter {
 			writer.write("then");
 			writer.write(getLineSeparator());
 		}
-		writer.write(variables + ";");
-		writer.write(writeWithSudo(s));
+		writer.write(lineWithSudo);
 		writer.write(getLineSeparator());
 		writer.write("[ $? -eq 0 ]  || exit 10");
 		writer.write(getLineSeparator());
@@ -83,16 +84,27 @@ public class ShWriter extends AbstractWriter {
 	}
 	
 	private String writeWithSudo(String s) {
-		return "sudo -E -u " + user +  " " + customShell + " -c '" + s + "'";
+		return "sudo -E -u " + user +  " " + customShell + " -c '" + (!escapingDisabled ? escape(s) : s) + "'";
+	}
+	
+	private String escapeVar(String s) {
+		if (s == null) return "";
+		return s.replace("$", "\\$");
 	}
 
 	private String escape(String s) {
+		if (s == null) return "";
+		return s.replace("\'", "\'\"\'\"\'");
+	}
+	
+	private String escapePrint(String s) {
+		if (s == null) return "";
 		return s.replace('"', '\'');
 	}
 
 	@Override
 	public void writeEnvVar(String s, String value) throws IOException {
-		writer.write("export " + s + "=" + value);
+		writer.write("export " + s + "=" + (!escapingDisabled ? escapeVar(value) : value));
 		writer.write(getLineSeparator());
 		writer.write("[ $? -eq 0 ]  || exit 20");
 		writer.write(getLineSeparator());
@@ -100,15 +112,34 @@ public class ShWriter extends AbstractWriter {
 
 	@Override
 	public void writeVar(String s, String value) throws IOException {
-		writer.write(s + "=" + value);
+		writer.write("export " + s + "=" + (!escapingDisabled ? escapeVar(value) : value));
 		writer.write(getLineSeparator());
 		writer.write("[ $? -eq 0 ]  || exit 20");
 		writer.write(getLineSeparator());
 	}
 	
 	@Override
+	public void writeMessage(String s) throws IOException {
+		if (interactive) {
+			writer.write("read -p \"" + s + "\nPress a key to continue.\" -n 1 -r");
+			writer.write(getLineSeparator());
+			writer.write("printf \"\\n\"");
+			writer.write(getLineSeparator());
+		} else {
+			writer.write(getEchoPrefix() + s);
+			writer.write(getLineSeparator());
+		}
+	}
+	
+	@Override
 	String getLineSeparator() {
 		return "\n";
+	}
+
+	@Override
+	public void writeFileExists(String path, String errorMessage) throws IOException {
+		writer.write("if [ -f " +  path + " ]; then echo \"File: " + path + " found.\n\"; else echo \"File: " + path + " Not found!\n\" & exit; fi");
+		writer.write(getLineSeparator());
 	}
 
 }

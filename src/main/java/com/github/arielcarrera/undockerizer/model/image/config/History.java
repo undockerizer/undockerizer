@@ -12,6 +12,8 @@ public class History {
 	private String created;
 	@JsonProperty("created_by")
 	private String createdBy;
+	@JsonProperty("comment")
+	private String comment;
 	@JsonProperty(value="empty_layer", defaultValue="false")
 	private boolean emptyLayer;
 }

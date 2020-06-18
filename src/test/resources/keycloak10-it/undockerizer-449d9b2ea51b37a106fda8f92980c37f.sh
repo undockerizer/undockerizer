@@ -1,5 +1,5 @@
 #!/bin/sh
-UNDOCKERIZER_WORKDIR="$PWD"
+export UNDOCKERIZER_WORKDIR="$PWD"
 export JDBC_POSTGRES_VERSION=42.2.5
 [ $? -eq 0 ]  || exit 20
 export JDBC_MYSQL_VERSION=8.0.19
@@ -18,23 +18,42 @@ export LANG=en_US.UTF-8
 [ $? -eq 0 ]  || exit 20
 # ARG var without default value: GIT_REPO
 # ARG var without default value: GIT_BRANCH
-KEYCLOAK_DIST=https://downloads.jboss.org/keycloak/10.0.2/keycloak-10.0.2.tar.gz
+export KEYCLOAK_DIST=https://downloads.jboss.org/keycloak/10.0.2/keycloak-10.0.2.tar.gz
 [ $? -eq 0 ]  || exit 20
 # Changed user to: root
-read -p "Are you sure do you want to execute ( GIT_BRANCH='10.0.2' GIT_REPO='' KEYCLOAK_DIST='https://downloads.jboss.org/keycloak/10.0.2/keycloak-10.0.2.tar.gz';microdnf update -y && microdnf install -y glibc-langpack-en gzip hostname java-11-openjdk-headless openssl tar which && microdnf clean all)? " -n 1 -r
+read -p "Line: sudo -E -u root /bin/sh -c 'GIT_BRANCH=10.0.2 GIT_REPO= KEYCLOAK_DIST=https://downloads.jboss.org/keycloak/10.0.2/keycloak-10.0.2.tar.gz ;microdnf update -y && microdnf install -y glibc-langpack-en gzip hostname java-11-openjdk-headless openssl tar which && microdnf clean all'
+Are you sure do you want to execute? " -n 1 -r
 printf "\n"
 if [[ $REPLY = "" || $REPLY =~ ^[Yy]$ ]]
 then
-GIT_BRANCH='10.0.2' GIT_REPO='' KEYCLOAK_DIST='https://downloads.jboss.org/keycloak/10.0.2/keycloak-10.0.2.tar.gz';sudo -E -u root /bin/sh -c 'microdnf update -y && microdnf install -y glibc-langpack-en gzip hostname java-11-openjdk-headless openssl tar which && microdnf clean all'
+sudo -E -u root /bin/sh -c 'GIT_BRANCH=10.0.2 GIT_REPO= KEYCLOAK_DIST=https://downloads.jboss.org/keycloak/10.0.2/keycloak-10.0.2.tar.gz ;microdnf update -y && microdnf install -y glibc-langpack-en gzip hostname java-11-openjdk-headless openssl tar which && microdnf clean all'
 [ $? -eq 0 ]  || exit 10
 fi
-read -p "Are you sure do you want to execute ( GIT_BRANCH='10.0.2' GIT_REPO='' KEYCLOAK_DIST='https://downloads.jboss.org/keycloak/10.0.2/keycloak-10.0.2.tar.gz';/opt/jboss/tools/build-keycloak.sh)? " -n 1 -r
+read -p "Line: sudo -E -u root /bin/sh -c 'mkdir -p $UNDOCKERIZER_WORKDIR/449d9b2ea51b37a106fda8f92980c37f6cb2122f00b355913448760527ba3f87/5fd998d971f674158f6827d23832fcc4e084b48384aa5067c0bbc160d2f60d04/layer.tar && tar -xvf $UNDOCKERIZER_WORKDIR/449d9b2ea51b37a106fda8f92980c37f-content/5fd998d971f674158f6827d23832fcc4e084b48384aa5067c0bbc160d2f60d04/layer.tar -C $UNDOCKERIZER_WORKDIR/449d9b2ea51b37a106fda8f92980c37f6cb2122f00b355913448760527ba3f87/5fd998d971f674158f6827d23832fcc4e084b48384aa5067c0bbc160d2f60d04/layer.tar'
+Are you sure do you want to execute? " -n 1 -r
 printf "\n"
 if [[ $REPLY = "" || $REPLY =~ ^[Yy]$ ]]
 then
-GIT_BRANCH='10.0.2' GIT_REPO='' KEYCLOAK_DIST='https://downloads.jboss.org/keycloak/10.0.2/keycloak-10.0.2.tar.gz';sudo -E -u root /bin/sh -c '/opt/jboss/tools/build-keycloak.sh'
+sudo -E -u root /bin/sh -c 'mkdir -p $UNDOCKERIZER_WORKDIR/449d9b2ea51b37a106fda8f92980c37f6cb2122f00b355913448760527ba3f87/5fd998d971f674158f6827d23832fcc4e084b48384aa5067c0bbc160d2f60d04/layer.tar && tar -xvf $UNDOCKERIZER_WORKDIR/449d9b2ea51b37a106fda8f92980c37f-content/5fd998d971f674158f6827d23832fcc4e084b48384aa5067c0bbc160d2f60d04/layer.tar -C $UNDOCKERIZER_WORKDIR/449d9b2ea51b37a106fda8f92980c37f6cb2122f00b355913448760527ba3f87/5fd998d971f674158f6827d23832fcc4e084b48384aa5067c0bbc160d2f60d04/layer.tar'
+[ $? -eq 0 ]  || exit 10
+fi
+read -p "Line: sudo -E -u root /bin/sh -c 'cp -r $UNDOCKERIZER_WORKDIR/449d9b2ea51b37a106fda8f92980c37f6cb2122f00b355913448760527ba3f87/5fd998d971f674158f6827d23832fcc4e084b48384aa5067c0bbc160d2f60d04/layer.tar/* / && rm -rf $UNDOCKERIZER_WORKDIR/449d9b2ea51b37a106fda8f92980c37f6cb2122f00b355913448760527ba3f87/5fd998d971f674158f6827d23832fcc4e084b48384aa5067c0bbc160d2f60d04/layer.tar'
+Are you sure do you want to execute? " -n 1 -r
+printf "\n"
+if [[ $REPLY = "" || $REPLY =~ ^[Yy]$ ]]
+then
+sudo -E -u root /bin/sh -c 'cp -r $UNDOCKERIZER_WORKDIR/449d9b2ea51b37a106fda8f92980c37f6cb2122f00b355913448760527ba3f87/5fd998d971f674158f6827d23832fcc4e084b48384aa5067c0bbc160d2f60d04/layer.tar/* / && rm -rf $UNDOCKERIZER_WORKDIR/449d9b2ea51b37a106fda8f92980c37f6cb2122f00b355913448760527ba3f87/5fd998d971f674158f6827d23832fcc4e084b48384aa5067c0bbc160d2f60d04/layer.tar'
+[ $? -eq 0 ]  || exit 10
+fi
+read -p "Line: sudo -E -u root /bin/sh -c 'GIT_BRANCH=10.0.2 GIT_REPO= KEYCLOAK_DIST=https://downloads.jboss.org/keycloak/10.0.2/keycloak-10.0.2.tar.gz ;/opt/jboss/tools/build-keycloak.sh'
+Are you sure do you want to execute? " -n 1 -r
+printf "\n"
+if [[ $REPLY = "" || $REPLY =~ ^[Yy]$ ]]
+then
+sudo -E -u root /bin/sh -c 'GIT_BRANCH=10.0.2 GIT_REPO= KEYCLOAK_DIST=https://downloads.jboss.org/keycloak/10.0.2/keycloak-10.0.2.tar.gz ;/opt/jboss/tools/build-keycloak.sh'
 [ $? -eq 0 ]  || exit 10
 fi
 # Changed user to: 1000
 # Expose Ports: 8080
 # Expose Ports: 8443
+echo Script executed successfully.

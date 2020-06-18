@@ -14,7 +14,5 @@ public interface Writer {
 	void writeVar(String s, String value) throws IOException;
 	void writeEnd() throws IOException;
 	void writeChangeUser(String user) throws IOException;
-	
-	
-
+	void writeFileExists(String path, String errorMessage) throws IOException;
 }
