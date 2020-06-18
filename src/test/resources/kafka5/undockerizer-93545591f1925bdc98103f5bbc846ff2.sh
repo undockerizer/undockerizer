@@ -76,3 +76,8 @@ export COMPONENT=kafka
 BUILD_NUMBER='1' COMMIT_ID='918b4cd';sudo -E -u root /bin/sh -c 'echo "===> installing ${COMPONENT}..."     && apt-get update && apt-get install -y confluent-kafka-${SCALA_VERSION}=${KAFKA_VERSION}${CONFLUENT_PLATFORM_LABEL}-${CONFLUENT_DEB_VERSION}         && echo "===> clean up ..."      && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*         && echo "===> Setting up ${COMPONENT} dirs..."     && mkdir -p /var/lib/${COMPONENT}/data /etc/${COMPONENT}/secrets    && chmod -R ag+w /etc/${COMPONENT} /var/lib/${COMPONENT}/data /etc/${COMPONENT}/secrets     && chown -R root:root /var/log/kafka /var/log/confluent /var/lib/kafka /var/lib/zookeeper'
 [ $? -eq 0 ]  || exit 10
 # VOLUME [/var/lib/kafka/data /etc/kafka/secrets]
+sudo -E -u root /bin/sh -c 'mkdir -p $UNDOCKERIZER_WORKDIR/93545591f1925bdc98103f5bbc846ff21e772b1fe66372226cffe19b4c9a7e01/525bb2aa9e1e555186a794f376d17a4ab9bd324874f9acb367b3e9b4d6cfb64b/layer.tar && tar -xvf $UNDOCKERIZER_WORKDIR/93545591f1925bdc98103f5bbc846ff2-content/525bb2aa9e1e555186a794f376d17a4ab9bd324874f9acb367b3e9b4d6cfb64b/layer.tar -C $UNDOCKERIZER_WORKDIR/93545591f1925bdc98103f5bbc846ff21e772b1fe66372226cffe19b4c9a7e01/525bb2aa9e1e555186a794f376d17a4ab9bd324874f9acb367b3e9b4d6cfb64b/layer.tar'
+[ $? -eq 0 ]  || exit 10
+sudo -E -u root /bin/sh -c 'cp -r $UNDOCKERIZER_WORKDIR/93545591f1925bdc98103f5bbc846ff21e772b1fe66372226cffe19b4c9a7e01/525bb2aa9e1e555186a794f376d17a4ab9bd324874f9acb367b3e9b4d6cfb64b/layer.tar/* / && rm -rf $UNDOCKERIZER_WORKDIR/93545591f1925bdc98103f5bbc846ff21e772b1fe66372226cffe19b4c9a7e01/525bb2aa9e1e555186a794f376d17a4ab9bd324874f9acb367b3e9b4d6cfb64b/layer.tar'
+[ $? -eq 0 ]  || exit 10
+echo Script executed successfully.

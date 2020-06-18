@@ -53,3 +53,4 @@ export LAUNCH_JBOSS_IN_BACKGROUND=true
 [ $? -eq 0 ]  || exit 20
 # Changed user to: jboss
 # Expose Ports: 8080
+echo Script executed successfully.

@@ -56,6 +56,12 @@ public class WindowsWriter extends AbstractWriter {
 		return "\n\r";
 	}
 
+	@Override
+	public void writeFileExists(String path, String errorMessage) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 
 }

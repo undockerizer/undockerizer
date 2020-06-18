@@ -107,8 +107,27 @@ public class ShWriter extends AbstractWriter {
 	}
 	
 	@Override
+	public void writeMessage(String s) throws IOException {
+		if (interactive) {
+			writer.write("read -p \"" + s + "\nPress a key to continue.\" -n 1 -r");
+			writer.write(getLineSeparator());
+			writer.write("printf \"\\n\"");
+			writer.write(getLineSeparator());
+		} else {
+			writer.write(getEchoPrefix() + s);
+			writer.write(getLineSeparator());
+		}
+	}
+	
+	@Override
 	String getLineSeparator() {
 		return "\n";
+	}
+
+	@Override
+	public void writeFileExists(String path, String errorMessage) throws IOException {
+		writer.write("if [ -f " +  path + " ]; then echo \"File: " + path + " found.\n\"; else echo \"File: " + path + " Not found!\n\" & exit; fi");
+		writer.write(getLineSeparator());
 	}
 
 }

@@ -28,3 +28,4 @@ GIT_BRANCH='10.0.2' GIT_REPO='' KEYCLOAK_DIST='https://downloads.jboss.org/keycl
 # Changed user to: 1000
 # Expose Ports: 8080
 # Expose Ports: 8443
+echo Script executed successfully.

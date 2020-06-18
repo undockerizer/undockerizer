@@ -38,3 +38,4 @@ fi
 # Changed user to: 1000
 # Expose Ports: 8080
 # Expose Ports: 8443
+echo Script executed successfully.

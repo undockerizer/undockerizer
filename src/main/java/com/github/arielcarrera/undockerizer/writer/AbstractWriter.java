@@ -44,6 +44,8 @@ public abstract class AbstractWriter implements Writer {
 			writer.write(getEndBlock());
 			writer.write(getLineSeparator());
 		}
+		writer.write(getEchoPrefix() + "Script executed successfully.");
+		writer.write(getLineSeparator());
 	}
 	
 	@Override
