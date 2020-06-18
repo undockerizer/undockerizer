@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:20.10
 
 MAINTAINER Ariel Carrera
 

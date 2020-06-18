@@ -5,5 +5,6 @@ $JAVA_HOME/bin/native-image --no-server \
 	     -H:Name=undockerizer-ubuntu \
 	     -H:Class=com.github.arielcarrera.undockerizer.Undockerizer \
 	     -H:+ReportUnsupportedElementsAtRuntime \
-	     -H:+AllowVMInspection \
-		 -H:ReflectionConfigurationFiles=/project/docker-graalvm/reflect.json
+	     -H:+AllowVMInspection 
+		 #\
+		 #-H:ReflectionConfigurationFiles=/project/docker-graalvm/reflect.json

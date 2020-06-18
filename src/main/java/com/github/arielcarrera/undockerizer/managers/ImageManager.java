@@ -163,8 +163,8 @@ public class ImageManager {
 		Future<?> result = Executors.newSingleThreadExecutor().submit(stream);
 		Future<?> errors = Executors.newSingleThreadExecutor().submit(errorStream);
 
-		result.get(10, TimeUnit.SECONDS);
-		errors.get(10, TimeUnit.SECONDS);
+		result.get(30, TimeUnit.SECONDS);
+		errors.get(30, TimeUnit.SECONDS);
 
 		if (!errStrBuilder.toString().isEmpty()) {
 			String s = errStrBuilder.toString();

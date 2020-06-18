@@ -106,8 +106,8 @@ public class Undockerizer implements Callable<Integer> {
 		try {
 			info = imageManager.inspectDockerImageInfo();
 		} catch (ImageNotFoundException e) {
-			
-			info = imageManager.inspectDockerImageInfo();
+			System.out.print("Image not found.");
+			return -1;
 		}
 		
 		// first check (cache) if files exists in temp file

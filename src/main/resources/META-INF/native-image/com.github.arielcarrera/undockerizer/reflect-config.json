@@ -18,43 +18,43 @@
 		]
 	},
 	{
-		"name": "com.github.arielcarrera.undockerizer.model.ConfigFile",
+		"name": "com.github.arielcarrera.undockerizer.model.image.ConfigFile",
 		"allDeclaredFields": true,
 		"allDeclaredMethods": true,
 		"allDeclaredConstructors": true
 	},
 	{
-		"name": "com.github.arielcarrera.undockerizer.model.InspectData",
+		"name": "com.github.arielcarrera.undockerizer.model.image.InspectData",
 		"allDeclaredFields": true,
 		"allDeclaredMethods": true,
 		"allDeclaredConstructors": true
 	},
 	{
-		"name": "com.github.arielcarrera.undockerizer.model.Manifest",
+		"name": "com.github.arielcarrera.undockerizer.model.image.Manifest",
 		"allDeclaredFields": true,
 		"allDeclaredMethods": true,
 		"allDeclaredConstructors": true
 	},
 	{
-		"name": "com.github.arielcarrera.undockerizer.model.config.Config",
+		"name": "com.github.arielcarrera.undockerizer.model.image.config.Config",
 		"allDeclaredFields": true,
 		"allDeclaredMethods": true,
 		"allDeclaredConstructors": true
 	},
 	{
-		"name": "com.github.arielcarrera.undockerizer.model.config.GraphDriver",
+		"name": "com.github.arielcarrera.undockerizer.model.image.config.GraphDriver",
 		"allDeclaredFields": true,
 		"allDeclaredMethods": true,
 		"allDeclaredConstructors": true
 	},
 	{
-		"name": "com.github.arielcarrera.undockerizer.model.config.History",
+		"name": "com.github.arielcarrera.undockerizer.model.image.config.History",
 		"allDeclaredFields": true,
 		"allDeclaredMethods": true,
 		"allDeclaredConstructors": true
 	},
 	{
-		"name": "com.github.arielcarrera.undockerizer.model.config.RootFS",
+		"name": "com.github.arielcarrera.undockerizer.model.image.config.RootFS",
 		"allDeclaredFields": true,
 		"allDeclaredMethods": true,
 		"allDeclaredConstructors": true
