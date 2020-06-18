@@ -46,10 +46,12 @@ public abstract class BaseUndockerizerTest {
 	@Test
 	public void testInteractive() throws IOException {
 		exit.expectSystemExitWithStatus(0);
-		exit.checkAssertionAfterwards(() ->
-			assertTrue(compareFiles(Paths.get("src","test", "resources", getTestFolderName() + "-it", getTestFileName()),
-				Paths.get("undockerizer", getTestFileName())))
-			);
+		exit.checkAssertionAfterwards(() -> {
+			assertTrue(compareFiles(Paths.get("src","test", "resources", getTestFolderName(), getTestFileName()),
+				Paths.get("undockerizer", getTestFileName())));
+			assertTrue(compareFiles(Paths.get("src","test", "resources", getTestFolderName(), Undockerizer.getInteractiveOutputFileName(getTestFileName())),
+					Paths.get("undockerizer", Undockerizer.getInteractiveOutputFileName(getTestFileName()))));
+		});
 		Undockerizer.main(new String[] {"-i", getImageName(), "-v", "-f", "-it"});
 	}
 
@@ -57,8 +59,10 @@ public abstract class BaseUndockerizerTest {
 	public void testTar() throws IOException {
 		exit.expectSystemExitWithStatus(0);
 		exit.checkAssertionAfterwards(() -> {
-			assertTrue(compareFiles(Paths.get("src","test", "resources", getTestFolderName() + "-it", getTestFileName()),
+			assertTrue(compareFiles(Paths.get("src","test", "resources", getTestFolderName(), getTestFileName()),
 					Paths.get("undockerizer", getTestFileName())));
+				assertTrue(compareFiles(Paths.get("src","test", "resources", getTestFolderName(), Undockerizer.getInteractiveOutputFileName(getTestFileName())),
+						Paths.get("undockerizer", Undockerizer.getInteractiveOutputFileName(getTestFileName()))));
 			assertTrue(Paths.get("undockerizer", getTestFileName() + ".tar.gz").toFile().exists());
 		});
 		Undockerizer.main(new String[] {"-i", getImageName(), "-v", "-f", "-it", "-t"});
