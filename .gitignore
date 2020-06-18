@@ -28,4 +28,7 @@ hs_err_pid*
 .classpath
 .settings
 /undockerizer/
-/src/main/test/**/priv/
+/src/main/test/**/priv
+/src/main/test/**/priv/**
+/src/test/resources/priv
+/src/test/resources/priv/**

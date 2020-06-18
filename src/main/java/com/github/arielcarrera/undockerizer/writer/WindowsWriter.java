@@ -9,8 +9,8 @@ public class WindowsWriter extends AbstractWriter {
 	private static final String ECHO_PREFIX= "echo ";
 	private static final String SET_PREFIX= "set ";
 	
-	public WindowsWriter(java.io.BufferedWriter writer, boolean interactive) {
-		super(writer, interactive);
+	public WindowsWriter(java.io.BufferedWriter writer, boolean interactive, boolean escapingDisabled) {
+		super(writer, interactive, escapingDisabled);
 	}
 	
 	protected String getBeginBlock() {

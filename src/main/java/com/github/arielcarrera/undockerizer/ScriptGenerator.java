@@ -366,7 +366,7 @@ public class ScriptGenerator {
 		String preParam = value.substring(0, indexOf);
 		int lastIndexOf = preParam.lastIndexOf(shellPathStr);
 		if (lastIndexOf < 0) throw new RuntimeException("Error processing command line with arguments (shell not found)");
-		w.writeCommand(value.substring(indexOf + 4), StringUtil.escapeVars(value.substring(0, lastIndexOf)));
+		w.writeCommand(value.substring(indexOf + 4), value.substring(0, lastIndexOf)); //StringUtil.escapeVars(value.substring(0, lastIndexOf)));
 	}
 
 }
