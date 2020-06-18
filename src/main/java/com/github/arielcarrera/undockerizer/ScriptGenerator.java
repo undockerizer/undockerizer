@@ -43,7 +43,6 @@ public class ScriptGenerator {
 	
 	public void generateScript(Manifest manifest, ConfigFile cfg, Writer w) throws IOException {
 		AttachmentManager attachManager = new AttachmentManager(manifest, cfg);
-		// TODO guardar endpoint, combinarlo con este archivo y ejecutarle
 		String lastCommandSentence, lastEntryPointSentence = null;
 		List<History> hist = cfg.getHistory();
 		boolean firstNoOpFound = false;
@@ -240,6 +239,10 @@ public class ScriptGenerator {
 			} else {
 				if (value.startsWith("file:")) {
 					filename = value.substring(5, indexOfIn);
+				} else if (value.startsWith("dir:")) {
+					filename = value.substring(4, indexOfIn);
+				} else {
+					System.err.println("Error processing ADD instruction (begin).");
 				}
 			}
 			if (value.startsWith(" in ", indexOfIn)) {
@@ -289,7 +292,7 @@ public class ScriptGenerator {
 		String preParam = value.substring(0, indexOf);
 		int lastIndexOf = preParam.lastIndexOf(shellPathStr);
 		if (lastIndexOf < 0) throw new RuntimeException("Error processing command line with arguments (shell not found)");
-		w.writeCommand(value.substring(indexOf + 4), StringUtil.escapeVars(value.substring(0, lastIndexOf)));
+		w.writeCommand(value.substring(indexOf + 4), value.substring(0, lastIndexOf)); //StringUtil.escapeVars(value.substring(0, lastIndexOf)));
 	}
 	
 }

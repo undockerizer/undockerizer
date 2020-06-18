@@ -67,6 +67,9 @@ public class Undockerizer implements Callable<Integer> {
     @Option(names = {"-t", "--tar"}, required = false, description = "Create tar file.", defaultValue = "false", showDefaultValue = Visibility.ALWAYS)
     boolean archive;
     
+    @Option(names = {"-de", "--disableEscaping"}, required = false, description = "Disable escaping of variables", defaultValue = "false", showDefaultValue = Visibility.ALWAYS)
+    boolean escapingDisabled;
+    
     private Set<Path> resourcesToArchive = new HashSet<Path>();
     
     private ArchiveManager archiveManager;
@@ -161,8 +164,8 @@ public class Undockerizer implements Callable<Integer> {
         
         ScriptGenerator scriptGenerator = new ScriptGenerator(verbose, archive, shellPathStr, resourcesToArchive);
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputScript)))) {
-        	//TODO change OSFamily
-        	Writer w = WriterFactory.create(OSFamily.UNIX, bw, shellPathStr, interactiveOutput);
+        	//TODO improve support for OSFamily
+        	Writer w = WriterFactory.create(OSFamily.UNIX, bw, shellPathStr, interactiveOutput, escapingDisabled);
         	w.writeBegin();
         	
         	scriptGenerator.generateScript(tempData.getManifest(), tempData.getConfig(), w);
