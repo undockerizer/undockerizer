@@ -20,6 +20,7 @@ import com.github.arielcarrera.undockerizer.exceptions.ImageNotFoundException;
 import com.github.arielcarrera.undockerizer.managers.ArchiveManager;
 import com.github.arielcarrera.undockerizer.managers.ContentManager;
 import com.github.arielcarrera.undockerizer.managers.ImageManager;
+import com.github.arielcarrera.undockerizer.managers.WriterManagerFactory;
 import com.github.arielcarrera.undockerizer.model.ContentData;
 import com.github.arielcarrera.undockerizer.model.image.ConfigFile;
 import com.github.arielcarrera.undockerizer.model.image.InspectData;
@@ -27,7 +28,6 @@ import com.github.arielcarrera.undockerizer.model.image.Manifest;
 import com.github.arielcarrera.undockerizer.utils.FileUtil;
 import com.github.arielcarrera.undockerizer.utils.OSUtil.OSFamily;
 import com.github.arielcarrera.undockerizer.writer.Writer;
-import com.github.arielcarrera.undockerizer.writer.WriterFactory;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -75,6 +75,8 @@ public class Undockerizer implements Callable<Integer> {
     private ArchiveManager archiveManager;
     private ImageManager imageManager;
     private ContentManager contentManager;
+    
+    private String interactiveOutputfileStr;
     
     private static final ObjectMapper mapper = new ObjectMapper()
     		.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
@@ -163,15 +165,28 @@ public class Undockerizer implements Callable<Integer> {
         if (archive) resourcesToArchive.add(outputScript.toPath());
         
         ScriptGenerator scriptGenerator = new ScriptGenerator(verbose, archive, shellPathStr, resourcesToArchive);
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputScript)))) {
-        	//TODO improve support for OSFamily
-        	Writer w = WriterFactory.create(OSFamily.UNIX, bw, shellPathStr, interactiveOutput, escapingDisabled);
-        	w.writeBegin();
+        
+        if (interactiveOutput) {
+        	interactiveOutputfileStr = getInteractiveOutputFileName(outputfileStr);
+        	File interactiveOutputScript = FileUtil.openOutputFile(interactiveOutputfileStr, force);
+        	if (archive) resourcesToArchive.add(interactiveOutputScript.toPath());
         	
-        	scriptGenerator.generateScript(tempData.getManifest(), tempData.getConfig(), w);
-        	w.writeEnd();
-        	System.out.println("Script generated successfully.");
+        	try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputScript)));
+        			BufferedWriter interactiveBw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(interactiveOutputScript)))) {
+            	Writer w = WriterManagerFactory.create(OSFamily.UNIX, bw, interactiveBw, shellPathStr, escapingDisabled);
+            	w.writeBegin();
+            	scriptGenerator.generateScript(tempData.getManifest(), tempData.getConfig(), w);
+            	w.writeEnd();
+            }
+        } else {
+	        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputScript)))) {
+	        	Writer w = WriterManagerFactory.create(OSFamily.UNIX, bw, shellPathStr, escapingDisabled);
+	        	w.writeBegin();
+	        	scriptGenerator.generateScript(tempData.getManifest(), tempData.getConfig(), w);
+	        	w.writeEnd();
+	        }
         }
+        System.out.println("Script generated successfully.");
         
         if (archive) {
 	        getArchiveManager().generateTar(outputfileStr, force, resourcesToArchive);
@@ -180,7 +195,15 @@ public class Undockerizer implements Callable<Integer> {
 	}
 
 
-    public static boolean promptToUser(String message) {
+    public static String getInteractiveOutputFileName(String outputfileStr2) {
+    	int lastIndexOf = outputfileStr2.lastIndexOf(".");
+    	if (lastIndexOf > -1) {
+    		return outputfileStr2.substring(0, lastIndexOf) +  "-it" + outputfileStr2.substring(lastIndexOf);
+    	}
+		return outputfileStr2 + "-it";
+	}
+
+	public static boolean promptToUser(String message) {
         try (Scanner scanner = new Scanner(System.in)){
 	        String value;
 	        boolean isTrue = false, isFalse = false;
