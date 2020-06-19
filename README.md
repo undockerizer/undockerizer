@@ -1,5 +1,5 @@
 # Undockerizer
-Undockerizer is a project that helps to convert a Docker image to an installer (shell script).
+Undockerizer is a tool that helps to create an installer (script) from a Docker image.
 
 ## Issue tracker: 
 - [github](https://github.com/arielcarrera/undockerizer/issues)
