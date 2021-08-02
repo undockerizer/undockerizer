@@ -28,7 +28,7 @@
 		<version.junit.systemrules>1.19.0</version.junit.systemrules>
 		<version.lombok>1.18.8</version.lombok>
 		<version.commons.io>2.6</version.commons.io>
-		<version.commons.compress>1.20</version.commons.compress>
+		<version.commons.compress>1.21</version.commons.compress>
 		<version.picocli>4.3.2</version.picocli>
 		<version.jackson>2.11.0</version.jackson>
 	</properties>
